@@ -1,0 +1,72 @@
+.cell {
+  display: block;
+  position: relative;
+  &_img {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    bottom: 4%;
+    left: 50%;
+    transform: translate(-50%);
+  }
+  &_highligher {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0.5;
+  }
+}
+.chessboard {
+  display: grid;
+  border: 1px solid black;
+  grid-column-start: 2; /* Начинается с первой линии (левая граница) */
+  grid-column-end: 3; /* Занимает две колонки (до третьей линии) */
+  grid-row-start: 2; /* Начинается с первой строки (верх) */
+  grid-row-end: 3;
+  &_wrapper {
+    grid-template-columns: 20px min-content 20px;
+    grid-template-rows: 20px min-content 20px;
+    padding: 20px;
+    display: grid;
+    background-color: #4c3d36;
+    color: #fff;
+    width: fit-content;
+  }
+  &_topLetters {
+    grid-column-start: 2; /* Начинается с первой линии (левая граница) */
+    grid-column-end: 3; /* Занимает две колонки (до третьей линии) */
+    display: grid;
+    grid-template-columns: repeat(8, 70px);
+    align-items: center;
+    justify-items: center;
+  }
+  &_bottomLetters {
+    grid-column-start: 2; /* Начинается с первой линии (левая граница) */
+    grid-column-end: 3; /* Занимает две колонки (до третьей линии) */
+    grid-row-start: 3; /* Начинается с первой строки (верх) */
+    display: grid;
+    grid-template-columns: repeat(8, 70px);
+    align-items: center;
+    justify-items: center;
+  }
+  &_rightNumbers {
+    grid-column-start: 1; /* Начинается с первой линии (левая граница) */
+    grid-row-start: 2;
+    grid-row-end: 3;
+    display: grid;
+    grid-template-rows: repeat(8, 70px);
+    align-items: center;
+    justify-items: center;
+  }
+  &_leftNumbers {
+    grid-column-start: 3; /* Начинается с первой линии (левая граница) */
+    grid-row-start: 2;
+    grid-row-end: 3;
+    display: grid;
+    grid-template-rows: repeat(8, 70px);
+    align-items: center;
+    justify-items: center;
+  }
+}
