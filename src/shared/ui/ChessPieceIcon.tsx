@@ -1,4 +1,4 @@
-import React, { type HTMLAttributes } from "react";
+import { type HTMLAttributes } from "react";
 import type { ChessPieceTypes, ChessSideT } from "../../types";
 import { FaChessPawn } from "react-icons/fa6";
 import { FaChessKing } from "react-icons/fa6";

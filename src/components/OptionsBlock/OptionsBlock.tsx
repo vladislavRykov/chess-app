@@ -1,10 +1,8 @@
-import React from "react";
 import s from "./OptionsBlock.module.scss";
 import { FaArrowRotateLeft } from "react-icons/fa6";
 import { AiOutlineRotateLeft } from "react-icons/ai";
 import { useSound } from "../../game/useSound";
 import VolumeIcon from "./VolumeIcon";
-import cn from "classnames";
 
 type resetGameBoard = {
   reverseGameBoard: () => void;

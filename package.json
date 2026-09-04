@@ -2,7 +2,7 @@
   "name": "chess",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://vladislavRykov.github.io/chess-app",
+  "homepage": "https://vladislavrykov.github.io/chess-app",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "classnames": "^2.5.1",

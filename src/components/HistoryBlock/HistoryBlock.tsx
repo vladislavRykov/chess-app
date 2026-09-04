@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import s from "./HistoryBlock.module.scss";
 import type { BoardHistoryT } from "../../types";
 import ChessPieceIcon from "../../shared/ui/ChessPieceIcon";

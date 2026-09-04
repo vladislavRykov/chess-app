@@ -1,4 +1,3 @@
-import React from "react";
 import type { CapturedPieceType } from "../../types";
 import ChessPieceIcon from "../../shared/ui/ChessPieceIcon";
 import s from "./CapturedPiecesC.module.scss";

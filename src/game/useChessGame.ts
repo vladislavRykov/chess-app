@@ -23,7 +23,6 @@ import {
 } from "../services/storageService";
 import {
   createInitialBoardState,
-  createInitialBoardStateCastling,
   createInitialCastlingRights,
   KingsInitialPositions,
 } from "./rules/state";

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import s from "./App.module.scss";
 import Chessboard from "./components/Chessboard/Chessboard";
 import HistoryBlock from "./components/HistoryBlock/HistoryBlock";

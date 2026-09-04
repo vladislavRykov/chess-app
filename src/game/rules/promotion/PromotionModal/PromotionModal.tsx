@@ -1,4 +1,3 @@
-import React from "react";
 import DefaultModal from "../../../../shared/ui/Modals/DefaultModal";
 import type {
   CapturedPieceType,

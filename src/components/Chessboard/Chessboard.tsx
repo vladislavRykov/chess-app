@@ -1,4 +1,3 @@
-import React from "react";
 import Cell from "./Cell";
 import s from "./Chessboard.module.scss";
 import { boardLetters, boardNumbers, cellData } from "../../game/ui/constants";

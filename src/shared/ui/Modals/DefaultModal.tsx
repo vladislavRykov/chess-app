@@ -1,4 +1,4 @@
-import React, { type ReactNode } from "react";
+import { type ReactNode } from "react";
 import s from "./DefaultModal.module.scss";
 
 interface DefaultModalT {

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   IoVolumeHigh,
   IoVolumeLow,
@@ -6,7 +5,6 @@ import {
   IoVolumeMute,
   IoVolumeOff,
 } from "react-icons/io5";
-
 const VolumeIcon = ({
   volume,
   isMuted,
