@@ -1,11 +1,17 @@
 import React from "react";
 import s from "./Chessboard.module.scss";
-import type { BoardHistoryT, ChessPieceTypes, ChessSideT } from "../../types";
-import ChessPieceIcon from "./ChessPieceIcon";
+import type {
+  BoardHistoryT,
+  ChessCheck,
+  ChessPieceTypes,
+  ChessSideT,
+} from "../../types";
 import {
+  CHECK_HIGHLIGHT_COLOR,
   HIGHLIGHT_COLOR,
   LAST_MOVE_HIGHLIGHT_COLOR,
-} from "../../game/chessboard";
+} from "../../game/ui/constants";
+import ChessPieceIcon from "../../shared/ui/ChessPieceIcon";
 
 type CellT = {
   color: string;
@@ -39,9 +45,11 @@ type CellT = {
   } | null;
   turn: ChessSideT;
   lastMove: BoardHistoryT | null;
+  checks: ChessCheck[];
 };
 
 const Cell = ({
+  checks,
   lastMove,
   turn,
   color,
@@ -59,6 +67,11 @@ const Cell = ({
   const isInAllowedMoves = Boolean(
     selectedPiece &&
     selectedPiece.allowedMoves.some(([r, c]) => r === row && c === col),
+  );
+  const isKingOrAttacker = checks.some(
+    (check) =>
+      (check.attaker.row === row && check.attaker.col === col) ||
+      (check.king.row === row && check.king.col === col),
   );
   return (
     <div
@@ -84,6 +97,12 @@ const Cell = ({
         <div
           className={s.cell_highligher}
           style={{ backgroundColor: LAST_MOVE_HIGHLIGHT_COLOR }}
+        ></div>
+      )}
+      {isKingOrAttacker && !isInAllowedMoves && (
+        <div
+          className={s.cell_highligher}
+          style={{ backgroundColor: CHECK_HIGHLIGHT_COLOR }}
         ></div>
       )}
       <ChessPieceIcon className={s.cell_img} cellStatus={cellStatus} />

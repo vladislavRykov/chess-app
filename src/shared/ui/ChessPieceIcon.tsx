@@ -9,6 +9,7 @@ import { FaChessRook } from "react-icons/fa6";
 import type { IconType } from "react-icons";
 
 type ChessPieceIconT = HTMLAttributes<IconType> & {
+  size?: string | number;
   cellStatus:
     | {
         type: ChessPieceTypes;
@@ -17,20 +18,40 @@ type ChessPieceIconT = HTMLAttributes<IconType> & {
     | "empty";
 };
 
-const ChessPieceIcon = ({ cellStatus, className }: ChessPieceIconT) => {
+const ChessPieceIcon = ({ cellStatus, className, size }: ChessPieceIconT) => {
   if (cellStatus === "empty") return <></>;
   if (cellStatus.type === "pawn")
-    return <FaChessPawn color={cellStatus.side} className={className} />;
+    return (
+      <FaChessPawn size={size} color={cellStatus.side} className={className} />
+    );
   if (cellStatus.type === "knight")
-    return <FaChessKnight color={cellStatus.side} className={className} />;
+    return (
+      <FaChessKnight
+        size={size}
+        color={cellStatus.side}
+        className={className}
+      />
+    );
   if (cellStatus.type === "bishop")
-    return <FaChessBishop color={cellStatus.side} className={className} />;
+    return (
+      <FaChessBishop
+        size={size}
+        color={cellStatus.side}
+        className={className}
+      />
+    );
   if (cellStatus.type === "rook")
-    return <FaChessRook color={cellStatus.side} className={className} />;
+    return (
+      <FaChessRook size={size} color={cellStatus.side} className={className} />
+    );
   if (cellStatus.type === "king")
-    return <FaChessKing color={cellStatus.side} className={className} />;
+    return (
+      <FaChessKing size={size} color={cellStatus.side} className={className} />
+    );
   if (cellStatus.type === "queen")
-    return <FaChessQueen color={cellStatus.side} className={className} />;
+    return (
+      <FaChessQueen size={size} color={cellStatus.side} className={className} />
+    );
   return <div>ChessPieceIcon</div>;
 };
 

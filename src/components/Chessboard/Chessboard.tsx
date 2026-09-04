@@ -1,18 +1,15 @@
 import React from "react";
 import Cell from "./Cell";
 import s from "./Chessboard.module.scss";
-import {
-  boardLetters,
-  boardNumbers,
-  cellData,
-  getRealCoords,
-} from "../../game/chessboard";
+import { boardLetters, boardNumbers, cellData } from "../../game/ui/constants";
 import type {
   BoardHistoryT,
   ChessBoardDataT,
+  ChessCheck,
   ChessPieceTypes,
   ChessSideT,
 } from "../../types";
+import { getRealCoords } from "../../game/helpers";
 
 type ChessboardT = {
   chessBoardData: ChessBoardDataT;
@@ -38,9 +35,11 @@ type ChessboardT = {
   } | null;
   isFlipped: boolean;
   turn: ChessSideT;
+  checks: ChessCheck[];
 };
 
 const Chessboard = ({
+  checks,
   turn,
   isFlipped,
   chessBoardData,
@@ -84,32 +83,29 @@ const Chessboard = ({
         className={s.chessboard}
         style={{ gridTemplateColumns: `repeat(8, ${cellData.width}px)` }}
       >
-        {chessboard.map(
-          (row, rowIdx) =>
-            // <div>
-            row.map((col, colIdx) => {
-              const realIdxes = getRealCoords(rowIdx, colIdx, isFlipped);
-              return (
-                <Cell
-                  lastMove={lastMove}
-                  turn={turn}
-                  selectedPiece={selectedPiece}
-                  onCellClickHandler={onCellClickHandler}
-                  cellStatus={col}
-                  // Icon={FaChessKnight}
-                  color={
-                    (colIdx + rowIdx) % 2 === 1
-                      ? cellData.color1
-                      : cellData.color2
-                  }
-                  key={`${realIdxes[0]}${realIdxes[1]}`}
-                  idx={`${realIdxes[0]}${realIdxes[1]}`}
-                  width={cellData.width}
-                  height={cellData.height}
-                />
-              );
-            }),
-          // </div>
+        {chessboard.map((row, rowIdx) =>
+          row.map((col, colIdx) => {
+            const realIdxes = getRealCoords(rowIdx, colIdx, isFlipped);
+            return (
+              <Cell
+                checks={checks}
+                lastMove={lastMove}
+                turn={turn}
+                selectedPiece={selectedPiece}
+                onCellClickHandler={onCellClickHandler}
+                cellStatus={col}
+                color={
+                  (colIdx + rowIdx) % 2 === 1
+                    ? cellData.color1
+                    : cellData.color2
+                }
+                key={`${realIdxes[0]}${realIdxes[1]}`}
+                idx={`${realIdxes[0]}${realIdxes[1]}`}
+                width={cellData.width}
+                height={cellData.height}
+              />
+            );
+          }),
         )}
       </div>
     </div>

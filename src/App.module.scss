@@ -1,8 +1,15 @@
 .main {
-  display: flex;
   background-color: var(--main-color);
   width: 100vw;
   height: 100vh;
+  padding: 20px;
+  &_wrapper {
+    display: flex;
+    width: 80%;
+    margin: 0 auto;
+    gap: 20px;
+    align-items: flex-start;
+  }
 }
 .chessBoard {
   // align-items: center;
@@ -12,6 +19,9 @@
     font-weight: 700;
     font-size: 20px;
     padding: 20px 0px;
+  }
+  &_check {
+    // color: rgb(211, 40, 40);
   }
   &_reverse {
     background-color: white;
@@ -25,4 +35,9 @@
     border: none;
     padding: 10px 20px;
   }
+}
+.rightSide {
+  width: 50%;
+  // flex-grow: 1;
+  // width: 100%;
 }

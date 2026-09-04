@@ -26,6 +26,7 @@
   grid-row-start: 2; /* Начинается с первой строки (верх) */
   grid-row-end: 3;
   &_wrapper {
+    border-radius: 5px;
     grid-template-columns: 20px min-content 20px;
     grid-template-rows: 20px min-content 20px;
     padding: 20px;

@@ -1,0 +1,21 @@
+.window {
+  position: relative;
+  &_list {
+    display: flex;
+    gap: 20px;
+  }
+  &_item {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+.exit {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+}

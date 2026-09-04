@@ -1,4 +1,4 @@
-import type { ChessBoardDataT, ChessPieceTypes, ChessSideT } from "../types";
+import type { ChessBoardDataT, ChessPieceTypes, ChessSideT } from "../../types";
 
 export const calcAllowedPieceMoves = ({
   boardState,
@@ -46,11 +46,8 @@ export const calcPawnAllowedMoves = ({
   const allowedMovesArray = [];
   let rowNumber = row;
   const direction = side === "white" ? -1 : 1;
-  if ((row === 6 && side === "white") || (row === 1 && side === "black")) {
-    allowedMovesArray.push([row + direction * 2, col]);
-  }
   rowNumber += direction;
-  if (rowNumber <= 7 && rowNumber >= 0) {
+  if (rowNumber in boardState) {
     if (
       col + 1 in boardState[rowNumber] &&
       boardState[rowNumber][col + 1] !== "empty"
@@ -65,6 +62,13 @@ export const calcPawnAllowedMoves = ({
     }
     if (boardState[rowNumber][col] === "empty") {
       allowedMovesArray.push([rowNumber, col]);
+      if (
+        row + direction * 2 in boardState &&
+        boardState[row + direction * 2][col] === "empty" &&
+        ((row === 6 && side === "white") || (row === 1 && side === "black"))
+      ) {
+        allowedMovesArray.push([row + direction * 2, col]);
+      }
     }
   }
 
@@ -146,7 +150,7 @@ export const calcBishopAllowedMoves = ({
 
   for (const dir of direction) {
     let currentPosition = [row + dir[0], col + dir[1]];
-    console.log(dir, currentPosition);
+    // console.log(dir, currentPosition);
     while (
       currentPosition[0] <= 7 &&
       currentPosition[0] >= 0 &&
@@ -191,7 +195,7 @@ export const calcRookAllowedMoves = ({
 
   for (const dir of direction) {
     let currentPosition = [row + dir[0], col + dir[1]];
-    console.log(dir, currentPosition);
+    // console.log(dir, currentPosition);
     while (
       currentPosition[0] <= 7 &&
       currentPosition[0] >= 0 &&
@@ -240,7 +244,7 @@ export const calcQueenAllowedMoves = ({
 
   for (const dir of direction) {
     let currentPosition = [row + dir[0], col + dir[1]];
-    console.log(dir, currentPosition);
+    // console.log(dir, currentPosition);
     while (
       currentPosition[0] <= 7 &&
       currentPosition[0] >= 0 &&

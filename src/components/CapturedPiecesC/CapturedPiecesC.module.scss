@@ -1,0 +1,21 @@
+.capturedBlock {
+  background-color: var(--history-block-color);
+  border-radius: 5px;
+  margin-bottom: 15px;
+  color: white;
+  padding: 20px;
+  &_title {
+    text-align: center;
+    margin: 0;
+  }
+  &_list {
+    padding: 10px 0px;
+  }
+  &_item {
+    margin-right: 8px;
+  }
+
+  &_count {
+    font-size: 14px;
+  }
+}

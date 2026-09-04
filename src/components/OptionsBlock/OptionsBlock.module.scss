@@ -1,0 +1,58 @@
+.optionsBlock {
+  background-color: var(--history-block-color);
+  padding: 15px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-self: flex-start;
+  margin-top: 100px;
+  &_button {
+    cursor: pointer;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--main-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    transition: 0.1s;
+    &:hover {
+      transform: scale(1.1);
+    }
+    &:active {
+      transform: scale(0.9);
+      animation: rotateIcon;
+    }
+    &:active .optionsBlock_icon {
+      animation: rotateIcon 0.2s linear;
+    }
+  }
+}
+.volume {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  &:hover &_input {
+    display: block;
+  }
+  &_btn {
+  }
+  &_input {
+    display: none;
+    writing-mode: vertical-lr;
+    direction: rtl;
+  }
+}
+
+@keyframes rotateIcon {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
