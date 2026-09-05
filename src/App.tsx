@@ -18,7 +18,7 @@ function App() {
     boardHistory,
     promotion,
     capturedPieces,
-    promotePawn,
+    onPromotionOptionClick,
     onClosePromotionModal,
     onCellClickHandler,
     reverseGameBoard,
@@ -60,7 +60,7 @@ function App() {
           <PromotionModal
             promotionPieceInfo={promotion.pieceInfo}
             onClose={onClosePromotionModal}
-            promotePawn={promotePawn}
+            promotePawn={onPromotionOptionClick}
             capturedPieces={capturedPieces}
           />
         )}
