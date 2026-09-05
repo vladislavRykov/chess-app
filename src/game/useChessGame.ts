@@ -3,11 +3,13 @@ import type {
   BoardHistoryT,
   CapturedPieceType,
   CastlingRights,
+  CellType,
   ChessBoardDataT,
   ChessCheck,
   ChessPieceTypes,
   ChessSideT,
   Promotion,
+  SelectedPieceType,
 } from "../types";
 
 import {
@@ -16,7 +18,12 @@ import {
   saveGameDataToLS,
 } from "./localStorage";
 import { triggerDeathAudio, triggerMoveAudio } from "./sound";
-import { getBoardAfterMove, getUpdateCastlingRights } from "./helpers";
+import {
+  getBoardAfterMove,
+  getUpdateCastlingRights,
+  getUpdatedCapturedPieces,
+  isCastlingNeedsUpdate,
+} from "./helpers";
 import {
   getlocalStorageData,
   setlocalStorageData,
@@ -82,76 +89,50 @@ export const useChessGame = () => {
     const gameData = getGameDataToLS();
     return gameData ? gameData.castlingRights : createInitialCastlingRights();
   });
-  const [selectedPiece, setSelectedPiece] = useState<{
-    type: ChessPieceTypes;
-    side: ChessSideT;
-    row: number;
-    col: number;
-    allowedMoves: number[][];
-  } | null>(null);
+  const [selectedPiece, setSelectedPiece] = useState<SelectedPieceType | null>(
+    null,
+  );
   const [promotion, setPromotion] = useState<Promotion>({
     active: false,
     pieceInfo: null,
   });
-  const getUpdatedCapturedPieces = (
-    piece: { type: ChessPieceTypes; side: ChessSideT },
-    delta: number,
-  ) => {
-    const capturedPiecesCopy = structuredClone(capturedPieces);
-    const pieceIndex = capturedPiecesCopy.findIndex(
-      (pieceInfo) =>
-        piece.type === pieceInfo.type && piece.side === pieceInfo.side,
-    );
 
-    if (pieceIndex === -1 && delta > 0) {
-      return [...capturedPiecesCopy, { ...piece, count: delta }];
-    } else if (pieceIndex >= 0) {
-      const updatedPieceCount = capturedPiecesCopy[pieceIndex].count + delta;
-      return updatedPieceCount <= 0
-        ? capturedPiecesCopy.filter(
-            (pieceInfo) =>
-              !(piece.type === pieceInfo.type && piece.side === pieceInfo.side),
-          )
-        : capturedPiecesCopy.map((pieceInfo) =>
-            pieceInfo.type === piece.type && piece.side === pieceInfo.side
-              ? { ...pieceInfo, count: updatedPieceCount }
-              : pieceInfo,
-          );
-    } else {
-      return capturedPiecesCopy;
-    }
-  };
   const changeSelectedPiecePosition = ({
+    selectedPiece,
     row,
     col,
   }: {
+    selectedPiece: SelectedPieceType;
     row: number;
     col: number;
   }) => {
-    if (!selectedPiece) return;
-    const isKing = selectedPiece.type === "king";
     if (!selectedPiece.allowedMoves.some(([r, c]) => r === row && c === col))
       return;
+
+    const isKing = selectedPiece.type === "king";
     const updatedTurn = turn === "white" ? "black" : "white";
-    if (isKing) {
-      console.log([selectedPiece.side], [selectedPiece.row, selectedPiece.col]);
-      setKingsCoords((prev) => {
-        return {
-          ...prev,
-          [selectedPiece.side]: [row, col],
-        };
-      });
-    }
-    const updatedCastlingRight = getUpdateCastlingRights({
+
+    const isCastlingRightsNeedsUpdate = isCastlingNeedsUpdate({
       castlingRights,
       movingPiece: {
         type: selectedPiece.type,
         side: selectedPiece.side,
-        row: selectedPiece.row,
         col: selectedPiece.col,
       },
     });
-    let updatedChessBoardData: ChessBoardDataT;
+    let updatedCastlingRight: CastlingRights;
+    if (isCastlingRightsNeedsUpdate) {
+      updatedCastlingRight = getUpdateCastlingRights({
+        castlingRights,
+        movingPiece: {
+          type: selectedPiece.type,
+          side: selectedPiece.side,
+          row: selectedPiece.row,
+          col: selectedPiece.col,
+        },
+      });
+      setCastlingRights(updatedCastlingRight);
+    }
     const isCastling = isMoveIsCastling({
       row,
       col,
@@ -170,48 +151,52 @@ export const useChessGame = () => {
         castling: isCastling,
       },
     ];
-    if (isCastling) {
-      updatedChessBoardData = makeCastlingMove({
-        boardState: chessBoardData,
-        row,
-        col,
-      });
-    } else {
-      updatedChessBoardData = getBoardAfterMove({
-        boardState: chessBoardData,
-        side: selectedPiece.side,
-        type: selectedPiece.type,
-        to: { row, col },
-        from: { row: selectedPiece.row, col: selectedPiece.col },
+    if (isKing) {
+      setKingsCoords((prev) => {
+        return {
+          ...prev,
+          [selectedPiece.side]: [row, col],
+        };
       });
     }
-    const newPositionData = chessBoardData[row][col];
+    const from = { row: selectedPiece.row, col: selectedPiece.col };
+    const to = { row, col };
+    const updatedChessBoardData: ChessBoardDataT = isCastling
+      ? makeCastlingMove({
+          boardState: chessBoardData,
+          row,
+          col,
+        })
+      : getBoardAfterMove({
+          boardState: chessBoardData,
+          side: selectedPiece.side,
+          type: selectedPiece.type,
+          to,
+          from,
+        });
     let updatedCP: CapturedPieceType[] = [];
+    const newPositionData = chessBoardData[row][col];
     if (newPositionData !== "empty") {
-      updatedCP = getUpdatedCapturedPieces(newPositionData, 1);
+      updatedCP = getUpdatedCapturedPieces(capturedPieces, newPositionData, 1);
       setCapturedPieces(updatedCP);
-      console.log(updatedCP);
-      // setCapturedPieces((prev) => [...prev, newPositionData]);
     }
-    const promotionPawn = isMoveIsPromotion({
+    const isPromotion = isMoveIsPromotion({
       pieceInfo: { type: selectedPiece.type, side: selectedPiece.side },
       row,
-      col,
     });
-    if (
-      promotionPawn &&
-      capturedPieces.some(
-        (piece) => piece.side === promotionPawn.side && piece.type !== "pawn",
-      )
-    ) {
-      setPromotion({ pieceInfo: promotionPawn, active: true });
+    const isCapturedPiecesNotOnlyPawns = capturedPieces.some(
+      (piece) => piece.side === selectedPiece.side && piece.type !== "pawn",
+    );
+    if (isPromotion && isCapturedPiecesNotOnlyPawns) {
+      const promotionPieceInfo = {
+        type: selectedPiece.type,
+        side: selectedPiece.side,
+        row,
+        col,
+      };
+      setPromotion({ pieceInfo: promotionPieceInfo, active: true });
     }
 
-    if (updatedCastlingRight) setCastlingRights(updatedCastlingRight);
-    setChessBoardData(updatedChessBoardData);
-    setTurn(updatedTurn);
-    setBoardHistory(updatedBoardHistory);
-    setSelectedPiece(null);
     const checksData = isKingInCheck({
       kings: isKing
         ? { ...kingsCoords, [selectedPiece.side]: [row, col] }
@@ -222,8 +207,17 @@ export const useChessGame = () => {
       boardState: updatedChessBoardData,
       checks: checksData,
     });
-    console.log(checksData, isCheckAndMate);
+
+    //States
+    // if (updatedCastlingRight) setCastlingRights(updatedCastlingRight);
+    setChessBoardData(updatedChessBoardData);
+    setTurn(updatedTurn);
+    setBoardHistory(updatedBoardHistory);
+    setSelectedPiece(null);
     setIsCheckMate(isCheckAndMate);
+    setChecks(checksData);
+
+    //Save to LS
     saveGameDataToLS({
       boardState: updatedChessBoardData,
       history: updatedBoardHistory,
@@ -236,74 +230,73 @@ export const useChessGame = () => {
         ? { ...kingsCoords, [selectedPiece.side]: [row, col] }
         : kingsCoords,
     });
-    setChecks(checksData);
+
+    //Audio effects
     triggerMoveAudio();
-    if (chessBoardData[row][col] !== "empty") {
-      console.log(chessBoardData[row][col]);
-      triggerDeathAudio();
-    }
+    // if (chessBoardData[row][col] !== "empty") {
+    //   triggerDeathAudio();
+    // }
+  };
+  const selectPiece = (
+    cellStatus: {
+      type: ChessPieceTypes;
+      side: ChessSideT;
+    },
+    idx: string,
+  ) => {
+    const allowedMoves = calcAllowedPieceMoves({
+      boardState: chessBoardData,
+      pieceType: cellStatus.type,
+      side: cellStatus.side,
+      row: Number(idx[0]),
+      col: Number(idx[1]),
+    });
+    const { moves } = checkIsCastlingAllowed({
+      boardState: chessBoardData,
+      type: cellStatus.type,
+      side: cellStatus.side,
+      checks: checks,
+      isCheckMate,
+      castlingRight: castlingRights,
+    });
+    const legalMoves = getlegalMoves({
+      moves: allowedMoves,
+      boardState: chessBoardData,
+      pieceKing: kingsCoords[cellStatus.side],
+      pieceInfo: {
+        side: cellStatus.side,
+        type: cellStatus.type,
+        row: Number(idx[0]),
+        col: Number(idx[1]),
+      },
+    });
+    setSelectedPiece({
+      side: cellStatus.side,
+      type: cellStatus.type,
+      row: Number(idx[0]),
+      col: Number(idx[1]),
+      allowedMoves: [...legalMoves, ...moves],
+    });
   };
   const onCellClickHandler = ({
     cellStatus,
     idx,
   }: {
-    cellStatus:
-      | "empty"
-      | {
-          type: ChessPieceTypes;
-          side: ChessSideT;
-        };
+    cellStatus: CellType;
     idx: string;
   }) => {
     if (!selectedPiece && cellStatus === "empty") return;
-    else if (
-      (!selectedPiece && cellStatus !== "empty") ||
-      (selectedPiece &&
-        cellStatus !== "empty" &&
-        cellStatus.side === selectedPiece.side)
-    ) {
-      if (cellStatus.side !== turn) return;
-      const allowedMoves = calcAllowedPieceMoves({
-        boardState: chessBoardData,
-        pieceType: cellStatus.type,
-        side: cellStatus.side,
-        row: Number(idx[0]),
-        col: Number(idx[1]),
-      });
-      const { moves } = checkIsCastlingAllowed({
-        boardState: chessBoardData,
-        type: cellStatus.type,
-        side: cellStatus.side,
-        checks: checks,
-        isCheckMate,
-        castlingRight: castlingRights,
-      });
-      console.log(123, moves, castlingRights);
-      const legalMoves = getlegalMoves({
-        moves: allowedMoves,
-        boardState: chessBoardData,
-        pieceKing: kingsCoords[cellStatus.side],
-        pieceInfo: {
-          side: cellStatus.side,
-          type: cellStatus.type,
-          row: Number(idx[0]),
-          col: Number(idx[1]),
-        },
-      });
-      setSelectedPiece({
-        side: cellStatus.side,
-        type: cellStatus.type,
-        row: Number(idx[0]),
-        col: Number(idx[1]),
-        allowedMoves: [...legalMoves, ...moves],
-      });
+    else if (cellStatus !== "empty" && cellStatus.side === turn) {
+      selectPiece(cellStatus, idx);
     } else if (
       selectedPiece &&
       `${selectedPiece.row}${selectedPiece.col}` !== idx
     ) {
-      if (selectedPiece && selectedPiece.side !== turn) return;
-
-      changeSelectedPiecePosition({ row: +idx[0], col: +idx[1] });
+      changeSelectedPiecePosition({
+        selectedPiece,
+        row: +idx[0],
+        col: +idx[1],
+      });
     }
   };
   const reverseGameBoard = () => {
@@ -351,7 +344,6 @@ export const useChessGame = () => {
         boardState: updatedChessBoard,
         checks: checksData,
       });
-      console.log(checksData, isCheckAndMate);
       setIsCheckMate(isCheckAndMate);
       setBoardHistory(updatedBoardHistory);
       saveGameDataToLS({
@@ -365,8 +357,11 @@ export const useChessGame = () => {
         castlingRights,
       });
       setChecks(checksData);
-      const updatedCP = getUpdatedCapturedPieces({ side, type }, -1);
-      console.log(updatedCP);
+      const updatedCP = getUpdatedCapturedPieces(
+        capturedPieces,
+        { side, type },
+        -1,
+      );
       setCapturedPieces(updatedCP);
     }
     onClosePromotionModal();

@@ -12,6 +12,15 @@ export type ChessBoardDataT = (
   | "empty"
 )[][];
 
+export type CellType = { type: ChessPieceTypes; side: ChessSideT } | "empty";
+export type SelectedPieceType = {
+  type: ChessPieceTypes;
+  side: ChessSideT;
+  row: number;
+  col: number;
+  allowedMoves: number[][];
+};
+
 export type BoardHistoryT = {
   from: {
     pieceInfo: { type: ChessPieceTypes; side: ChessSideT };

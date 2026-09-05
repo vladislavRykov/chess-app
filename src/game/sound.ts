@@ -1,7 +1,7 @@
 import { getlocalStorageData } from "../services/storageService";
 
-const moveAudio = new Audio("/sounds/piece_is_placed.mp3");
-const deathSound = new Audio("/sounds/umineko-door.mp3");
+const moveAudio = new Audio("/chess-app/sounds/piece_is_placed.mp3");
+const deathSound = new Audio("/chess-app/sounds/umineko-door.mp3");
 const storageVolume = getlocalStorageData("game_volume");
 deathSound.volume = storageVolume !== null ? storageVolume / 10 : 0.05;
 moveAudio.volume = storageVolume !== null ? storageVolume : 0.5;
