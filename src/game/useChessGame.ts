@@ -17,12 +17,11 @@ import {
   removeGameDataToLS,
   saveGameDataToLS,
 } from "./localStorage";
-import { triggerDeathAudio, triggerMoveAudio } from "./sound";
+import { triggerMoveAudio } from "./sound";
 import {
   getBoardAfterMove,
   getUpdateCastlingRights,
   getUpdatedCapturedPieces,
-  isCastlingNeedsUpdate,
 } from "./helpers";
 import {
   getlocalStorageData,
@@ -111,28 +110,17 @@ export const useChessGame = () => {
 
     const isKing = selectedPiece.type === "king";
     const updatedTurn = turn === "white" ? "black" : "white";
-
-    const isCastlingRightsNeedsUpdate = isCastlingNeedsUpdate({
+    const updatedCastlingRight = getUpdateCastlingRights({
       castlingRights,
       movingPiece: {
         type: selectedPiece.type,
         side: selectedPiece.side,
+        row: selectedPiece.row,
         col: selectedPiece.col,
       },
     });
-    let updatedCastlingRight: CastlingRights;
-    if (isCastlingRightsNeedsUpdate) {
-      updatedCastlingRight = getUpdateCastlingRights({
-        castlingRights,
-        movingPiece: {
-          type: selectedPiece.type,
-          side: selectedPiece.side,
-          row: selectedPiece.row,
-          col: selectedPiece.col,
-        },
-      });
-      setCastlingRights(updatedCastlingRight);
-    }
+    if (updatedCastlingRight) setCastlingRights(updatedCastlingRight);
+
     const isCastling = isMoveIsCastling({
       row,
       col,

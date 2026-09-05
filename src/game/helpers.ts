@@ -59,12 +59,15 @@ export const isCastlingNeedsUpdate = ({
   };
 }) => {
   const pieceType = movingPiece.type;
-  if (pieceType !== "king" && pieceType !== "rook") return false;
+  if (pieceType !== "king" && pieceType !== "rook")
+    return { isUpdatedNeeded: false };
   const rooksOrKings = getRookSideOrKing({
     type: pieceType,
     col: movingPiece.col,
   });
-  return !castlingRights[movingPiece.side][rooksOrKings];
+  if (!castlingRights[movingPiece.side][rooksOrKings])
+    return { isUpdatedNeeded: true, rooksOrKings };
+  return { isUpdatedNeeded: false };
 };
 export const getUpdateCastlingRights = ({
   castlingRights,
@@ -78,8 +81,14 @@ export const getUpdateCastlingRights = ({
     col: number;
   };
 }) => {
+  if (movingPiece.type !== "king" && movingPiece.type !== "rook") return null;
+  const rooksOrKings = getRookSideOrKing({
+    type: movingPiece.type,
+    col: movingPiece.col,
+  });
+  if (!castlingRights[movingPiece.side][rooksOrKings]) return null;
   const updatedCastlingRights: CastlingRights = structuredClone(castlingRights);
-  const rooksOrKings = getRookSideOrKing(movingPiece);
+
   updatedCastlingRights[movingPiece.side][rooksOrKings] = true;
   return updatedCastlingRights;
 };
